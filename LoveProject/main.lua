@@ -3,7 +3,7 @@ function love.load()
 
     gameState = "playing"
     keypress = 0
-    score = 99
+    score = 35
     beatCounter = 0
     accuracy = " "
     maxCombo = 0
@@ -49,6 +49,7 @@ function love.load()
     :setVolume(0.3)
     :play()
     totalBeats = music:getTotalBeats()
+    buildNoteMap(totalBeats)
 
 end
 
@@ -86,7 +87,7 @@ function love.update(dt)
     end)
 end
 
-function love.draw()
+function love.draw()    
     if gameState == "playing" then
         love.graphics.setBackgroundColor(.17,.31,.51)
         progressX = 5.9 * score
@@ -104,6 +105,7 @@ function love.draw()
     love.graphics.print("Combo: " .. keypress, 10, 10)
     love.graphics.print(accuracy, 300, 10)
     love.graphics.print("Max Combo: " .. maxCombo, 400, 80)
+    love.graphics.print(beatMap[beat], 300, 300)
 
     if gameState == "Lose" then
         music:stop()
@@ -137,6 +139,21 @@ function playSound(sound1, sound2)
     elseif soundContainer > 3 then
         sound2:play()
     end
+end
+
+function buildNoteMap(numBeats)
+    beatMap = {}
+    for i =0,numBeats,1 do
+        randomBeat = love.math.random(0,10)
+        if randomBeat < 3 then
+            beatMap[i] = "rest"
+        elseif randomBeat >= 3 and randomBeat < 6 then
+            beatMap[i] = "right"
+        elseif randomBeat >= 6 then
+            beatMap[i] = "left"
+        end
+    end
+    return beatMap
 end
 
 
