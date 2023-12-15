@@ -7,6 +7,8 @@ function love.load()
     beatCounter = 0
     accuracy = " "
     maxCombo = 0
+    movingNotes = {}
+    noteVelocity = {}
 
     kickDrumSFX = love.audio.newSource("Sound/Drummer/kick-drum.mp3", "static")
     kickDrumSFX:setVolume(8)
@@ -36,7 +38,11 @@ function love.load()
     :setBPM(140)
     --:setBPM(lovebpm.detectBPM("Music/loop.ogg"))
     :setLooping(false)
-    :on("beat", function(n)
+    totalBeats = music:getTotalBeats()
+    buildNoteMap(totalBeats)
+    music:play()
+    music:on("beat", function(n)
+        local beat, subbeat = music:getBeat()
         animate(guitarist)
         animate(drummer)
         if accuracy == "Miss" then
@@ -45,17 +51,22 @@ function love.load()
         if gameState == "Turbo" then
             love.graphics.setBackgroundColor(love.math.random(0.1,0.9),love.math.random(0.1,0.9),love.math.random(0.1,0.9))
         end
+        table.insert(movingNotes, beat)
+        table.insert(noteVelocity, beat)
+        movingNotes[beat] = 640
+        noteVelocity[beat] = 5
     end)
     :setVolume(0.3)
-    :play()
-    totalBeats = music:getTotalBeats()
-    buildNoteMap(totalBeats)
-
 end
 
 function love.update(dt)
     music:update()
     local beat, subbeat = music:getBeat()
+
+    for i = 0,#movingNotes,1 do
+        movingNotes[i] = movingNotes[i] - noteVelocity[i]
+    end
+
     if beatCounter + 1 < beat and gameState == "playing" then
         accuracy = "Miss"
         keypress = 0
@@ -107,6 +118,11 @@ function love.draw()
     love.graphics.print("Max Combo: " .. maxCombo, 400, 80)
     love.graphics.print(beatMap[beat], 300, 300)
 
+    for i = 0,#movingNotes,1 do
+        love.graphics.circle("fill", movingNotes[i], 30, 20)
+    end
+
+
     if gameState == "Lose" then
         music:stop()
         love.graphics.clear()
@@ -143,7 +159,7 @@ end
 
 function buildNoteMap(numBeats)
     beatMap = {}
-    for i =0,numBeats,1 do
+    for i = 0,numBeats,1 do
         randomBeat = love.math.random(0,10)
         if randomBeat < 3 then
             beatMap[i] = "rest"
