@@ -33,6 +33,11 @@ function love.load()
     drummer.frame1:setFilter("linear", "nearest")
     drummer.currentFrame = drummer.frame1
 
+    leftNote = love.graphics.newImage("Sprites/UI/notes/left-note.png")
+    leftNote:setFilter("linear", "nearest")
+    rightNote = love.graphics.newImage("Sprites/UI/notes/right-note.png")
+    rightNote:setFilter("linear", "nearest")
+
     music = lovebpm.newTrack()
     :load("Music/just-my-size.mp3")
     :setBPM(140)
@@ -51,10 +56,17 @@ function love.load()
         if gameState == "Turbo" then
             love.graphics.setBackgroundColor(love.math.random(0.1,0.9),love.math.random(0.1,0.9),love.math.random(0.1,0.9))
         end
-        table.insert(movingNotes, beat)
-        table.insert(noteVelocity, beat)
-        movingNotes[beat] = 640
-        noteVelocity[beat] = 5
+        if beatMap[beat] ~= "rest" then
+            table.insert(movingNotes, beat)
+            table.insert(noteVelocity, beat)
+            movingNotes[beat] = 640
+            noteVelocity[beat] = 5
+        else
+            table.insert(movingNotes, beat)
+            table.insert(noteVelocity, beat)
+            movingNotes[beat] = 641
+            noteVelocity[beat] = 0
+        end
     end)
     :setVolume(0.3)
 end
@@ -110,6 +122,13 @@ function love.draw()
 
     love.graphics.rectangle("fill", 30, 430, progressX, 30)
 
+    love.graphics.setColor(0.7,0.7,0.7,0.5)
+    love.graphics.rectangle("fill", 0, 30, 640, 64)
+    love.graphics.setColor(0.3,0.3,0.3,0.5)
+    love.graphics.setLineWidth(5)
+    love.graphics.rectangle("line", -10, 30, 660, 64)
+    love.graphics.setColor(1,1,1)
+
     local beat, subbeat = music:getBeat()
     --love.graphics.print(beat, 500, 10)
     love.graphics.setFont(love.graphics.newFont(25))
@@ -117,9 +136,16 @@ function love.draw()
     love.graphics.print(accuracy, 300, 10)
     love.graphics.print("Max Combo: " .. maxCombo, 400, 80)
     love.graphics.print(beatMap[beat], 300, 300)
-
+ 
     for i = 0,#movingNotes,1 do
-        love.graphics.circle("fill", movingNotes[i], 30, 20)
+        if movingNotes[i] < 641 and movingNotes[i] > 0 then
+            if beatMap[i] == "left" then
+                love.graphics.draw(leftNote, movingNotes[i], 30, 0, 2, 2)
+            elseif beatMap[i] == "right" then
+                love.graphics.draw(rightNote, movingNotes[i], 30, 0, 2, 2)
+            end
+            --love.graphics.circle("fill", movingNotes[i], 30, 20)
+        end
     end
 
 
