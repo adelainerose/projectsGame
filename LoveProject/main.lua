@@ -37,6 +37,8 @@ function love.load()
     leftNote:setFilter("linear", "nearest")
     rightNote = love.graphics.newImage("Sprites/UI/notes/right-note.png")
     rightNote:setFilter("linear", "nearest")
+    noteTarget = love.graphics.newImage("Sprites/UI/note-target.png")
+    noteTarget:setFilter("linear", "nearest")
 
     music = lovebpm.newTrack()
     :load("Music/just-my-size.mp3")
@@ -56,16 +58,16 @@ function love.load()
         if gameState == "Turbo" then
             love.graphics.setBackgroundColor(love.math.random(0.1,0.9),love.math.random(0.1,0.9),love.math.random(0.1,0.9))
         end
-        if beatMap[beat] ~= "rest" then
-            table.insert(movingNotes, beat)
-            table.insert(noteVelocity, beat)
-            movingNotes[beat] = 640
-            noteVelocity[beat] = 5
+        if beatMap[beat + 4] ~= "rest" then
+            table.insert(movingNotes, (beat + 4))
+            table.insert(noteVelocity, (beat + 4))
+            movingNotes[beat + 4] = 640
+            noteVelocity[beat + 4] = (635 * (14/360))/4
         else
-            table.insert(movingNotes, beat)
-            table.insert(noteVelocity, beat)
-            movingNotes[beat] = 641
-            noteVelocity[beat] = 0
+            table.insert(movingNotes, (beat + 4))
+            table.insert(noteVelocity, (beat + 4))
+            movingNotes[beat + 4] = 641
+            noteVelocity[beat + 4] = 0
         end
     end)
     :setVolume(0.3)
@@ -75,15 +77,15 @@ function love.update(dt)
     music:update()
     local beat, subbeat = music:getBeat()
 
-    for i = 0,#movingNotes,1 do
+    for i = 4,#movingNotes,1 do
         movingNotes[i] = movingNotes[i] - noteVelocity[i]
     end
 
-    if beatCounter + 1 < beat and gameState == "playing" then
+    if beatCounter + 1 < beat and gameState == "playing" and beatMap[beat] ~= "rest" then
         accuracy = "Miss"
         keypress = 0
     end
-    if beatCounter + 1 < beat and gameState == "Turbo" then
+    if beatCounter + 1 < beat and gameState == "Turbo" and beatMap[beat] ~= "rest" then
         accuracy = "Miss"
         keypress = 0
     end
@@ -122,23 +124,25 @@ function love.draw()
 
     love.graphics.rectangle("fill", 30, 430, progressX, 30)
 
-    love.graphics.setColor(0.7,0.7,0.7,0.5)
-    love.graphics.rectangle("fill", 0, 30, 640, 64)
-    love.graphics.setColor(0.3,0.3,0.3,0.5)
+    love.graphics.setColor(0.5,0.5,0.5)
+    love.graphics.rectangle("fill", 50, 30, 640, 64)
+    love.graphics.setColor(0.21,0.21,0.21)
     love.graphics.setLineWidth(5)
-    love.graphics.rectangle("line", -10, 30, 660, 64)
+    love.graphics.rectangle("line", 50, 30, 660, 64)
     love.graphics.setColor(1,1,1)
+
+    love.graphics.draw(noteTarget, (5), (62-45), 0, 2, 2)
 
     local beat, subbeat = music:getBeat()
     --love.graphics.print(beat, 500, 10)
     love.graphics.setFont(love.graphics.newFont(25))
-    love.graphics.print("Combo: " .. keypress, 10, 10)
+    love.graphics.print("Combo: " .. keypress, 10, 130)
     love.graphics.print(accuracy, 300, 10)
-    love.graphics.print("Max Combo: " .. maxCombo, 400, 80)
+    love.graphics.print("Max Combo: " .. maxCombo, 400, 100)
     love.graphics.print(beatMap[beat], 300, 300)
  
-    for i = 0,#movingNotes,1 do
-        if movingNotes[i] < 641 and movingNotes[i] > 0 then
+    for i = 4,#movingNotes,1 do
+        if movingNotes[i] < 641 and movingNotes[i] > 20 then
             if beatMap[i] == "left" then
                 love.graphics.draw(leftNote, movingNotes[i], 30, 0, 2, 2)
             elseif beatMap[i] == "right" then
@@ -185,7 +189,10 @@ end
 
 function buildNoteMap(numBeats)
     beatMap = {}
-    for i = 0,numBeats,1 do
+    for i = 0,4,1 do
+        beatMap[i] = "rest"
+    end
+    for i = 5,numBeats,1 do
         randomBeat = love.math.random(0,10)
         if randomBeat < 3 then
             beatMap[i] = "rest"
