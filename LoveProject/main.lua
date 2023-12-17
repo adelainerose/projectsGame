@@ -19,6 +19,9 @@ function love.load()
     drumHitSFX = love.audio.newSource("Sound/Drummer/drum-hit.mp3", "static")
     drumHitSFX:setVolume(8)
 
+    background = love.graphics.newImage("Sprites/projects-background.png")
+    background:setFilter("linear", "nearest")
+
     guitarist = {}
     guitarist.frame0 = love.graphics.newImage("Sprites/guitarist/sprite_0.png")
     guitarist.frame0:setFilter("linear", "nearest")
@@ -52,11 +55,11 @@ function love.load()
         local beat, subbeat = music:getBeat()
         animate(guitarist)
         animate(drummer)
+        turboR = love.math.random(0.1,0.9)
+        turboG = love.math.random(0.1,0.9)
+        turboB = love.math.random(0.1,0.9)
         if accuracy == "Miss" then
             score = score - 1
-        end
-        if gameState == "Turbo" then
-            love.graphics.setBackgroundColor(love.math.random(0.1,0.9),love.math.random(0.1,0.9),love.math.random(0.1,0.9))
         end
         if beatMap[beat + 4] ~= "rest" then
             table.insert(movingNotes, (beat + 4))
@@ -113,10 +116,23 @@ function love.update(dt)
 end
 
 function love.draw()    
+
     if gameState == "playing" then
-        love.graphics.setBackgroundColor(.17,.31,.51)
+        love.graphics.draw(background, -350, -150, 0, 3, 3)
+        love.graphics.setColor(0.2,0.2,0.2, 0.5)
+        love.graphics.rectangle("fill", 0, 0, 640, 480)
+        love.graphics.setColor(1,1,1)
         progressX = 5.9 * score
     end
+
+    if gameState == "Turbo" then
+        love.graphics.draw(background, -350, -150, 0, 3, 3)
+        love.graphics.setColor(turboR,turboG,turboB, 0.5)
+        love.graphics.rectangle("fill", 0, 0, 640, 480)
+        love.graphics.setColor(1,1,1)
+        progressX = 590
+    end
+
     love.graphics.draw(guitarist.currentFrame, 60, 200, 0, 3, 3)
     love.graphics.draw(drummer.currentFrame, 400, 220, 0, 3, 3)
 
@@ -159,9 +175,6 @@ function love.draw()
         love.graphics.print("You lose.", 150, 10)
         love.graphics.print("Press space to play again!", 150, 150)
     end
-    if gameState == "Turbo" then
-        progressX = 590
-    end
     if gameState == "Win" then
         music:stop()
         love.graphics.clear()
@@ -194,19 +207,58 @@ function buildNoteMap(numBeats)
     end
     for i = 5,numBeats,1 do
         randomBeat = love.math.random(0,10)
-        if randomBeat < 3 then
+        if randomBeat < 5 then
             beatMap[i] = "rest"
-        elseif randomBeat >= 3 and randomBeat < 6 then
-            beatMap[i] = "right"
-        elseif randomBeat >= 6 then
+        elseif randomBeat >= 5 and randomBeat < 7.5 then
             beatMap[i] = "left"
+        elseif randomBeat >= 7.5 then
+            beatMap[i] = "right"
         end
     end
     return beatMap
 end
 
+function checkNoteFront(beat, subbeat, beatCounter)
+    if subbeat < .2 then
+        if beatCounter ~= beat then
+            keypress = keypress + 1
+            score = score + 1
+            accuracy = "Perfect!"
+        end
+    elseif subbeat < .4 then
+        if beatCounter ~= beat then
+            keypress = keypress + 1
+            score = score + 1
+            accuracy = "Great!"
+        end
+    end
+    return keypress, score, accuracy
+end
+
+function checkNoteEnd(beat, subbeat, beatCounter)
+    if subbeat > .8 then
+        if beatCounter ~= beat then
+            keypress = keypress + 1
+            score = score + 1
+            accuracy = "Perfect!"
+        end
+    elseif subbeat > .6 then
+        if beatCounter ~= beat then
+            keypress = keypress + 1
+            score = score + 1
+            accuracy = "Great!"
+        end
+    elseif subbeat <= 0.6 and subbeat >= 0.4 then
+        keypress = 0
+        accuracy = "Bad."
+        score = score - 1
+    end
+    return keypress, score, beatCounter, accuracy
+end
 
 function love.keypressed(k)
+    local beat, subbeat = music:getBeat()
+
     if k == "1" then
       -- Toggle pause
       paused = not paused
@@ -216,30 +268,39 @@ function love.keypressed(k)
         music:play()
       end
     end
-    if k == "space" and gameState == "playing" or gameState == "Turbo" then
-      local beat, subbeat = music:getBeat()
-      playSound(kickDrumSFX, drumHitSFX)
-      if subbeat < .2 or subbeat > .8 then
-        if beatCounter ~= beat then
-          keypress = keypress + 1
-          score = score + 1
-          beatCounter = beat
-          accuracy = "Perfect!"
+
+    if k == "f" and gameState == "playing" or gameState == "Turbo" then
+        kickDrumSFX:play()
+        if beatMap[beat] == "left" then
+            checkNoteFront(beat, subbeat, beatCounter)
+            checkNoteEnd(beat, subbeat, beatCounter)
+        elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "left" then
+            checkNoteEnd(beat, subbeat, beatCounter)
+        -- else
+        --     beatCounter = beat
+        --     keypress = 0
+        --     accuracy = "Miss"
+        --     score = score - 1
         end
-      elseif subbeat < .4 or subbeat > .6 then
-        if beatCounter ~= beat then
-          keypress = keypress + 1
-          score = score + 1
-          beatCounter = beat
-          accuracy = "Great!"
-        end
-      else
         beatCounter = beat
-        keypress = 0
-        accuracy = "Bad."
-        score = score - 1
-      end
     end
+
+    if k == "j" and gameState == "playing" or gameState == "Turbo" then
+        drumHitSFX:play()
+        if beatMap[beat] == "right" then
+            checkNoteFront(beat, subbeat, beatCounter)
+            checkNoteEnd(beat, subbeat, beatCounter)
+        elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "right" then
+            checkNoteEnd(beat, subbeat, beatCounter)
+        -- else
+        --     beatCounter = beat
+        --     keypress = 0
+        --     accuracy = "Miss"
+        --     score = score - 1
+        end
+        beatCounter = beat
+    end
+
     if k == "space" then
         if gameState == "Lose" or gameState == "Win" then
             gameState = "playing"
@@ -252,5 +313,3 @@ function love.keypressed(k)
         end
     end
 end
-
-
