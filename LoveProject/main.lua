@@ -9,6 +9,9 @@ function love.load()
     maxCombo = 0
     movingNotes = {}
     noteVelocity = {}
+    backgroundTiltY = -250
+    playerTiltY = 100
+    noteOffset = 4
 
     kickDrumSFX = love.audio.newSource("Sound/Drummer/kick-drum.mp3", "static")
     kickDrumSFX:setVolume(8)
@@ -61,16 +64,16 @@ function love.load()
         if accuracy == "Miss" then
             score = score - 1
         end
-        if beatMap[beat + 4] ~= "rest" then
-            table.insert(movingNotes, (beat + 4))
-            table.insert(noteVelocity, (beat + 4))
-            movingNotes[beat + 4] = 640
-            noteVelocity[beat + 4] = (635 * (14/360))/4
+        if beatMap[beat + noteOffset] ~= "rest" then
+            table.insert(movingNotes, (beat + noteOffset))
+            table.insert(noteVelocity, (beat + noteOffset))
+            movingNotes[beat + noteOffset] = 640
+            noteVelocity[beat + noteOffset] = (635 * (14/360))/noteOffset
         else
-            table.insert(movingNotes, (beat + 4))
-            table.insert(noteVelocity, (beat + 4))
-            movingNotes[beat + 4] = 641
-            noteVelocity[beat + 4] = 0
+            table.insert(movingNotes, (beat + noteOffset))
+            table.insert(noteVelocity, (beat + noteOffset))
+            movingNotes[beat + noteOffset] = 641
+            noteVelocity[beat + noteOffset] = 0
         end
     end)
     :setVolume(0.3)
@@ -80,7 +83,12 @@ function love.update(dt)
     music:update()
     local beat, subbeat = music:getBeat()
 
-    for i = 4,#movingNotes,1 do
+    if backgroundTiltY ~= -150 then
+        backgroundTiltY = backgroundTiltY + 1
+        playerTiltY = playerTiltY + 1
+    end
+
+    for i = noteOffset,#movingNotes,1 do
         movingNotes[i] = movingNotes[i] - noteVelocity[i]
     end
 
@@ -118,7 +126,7 @@ end
 function love.draw()    
 
     if gameState == "playing" then
-        love.graphics.draw(background, -350, -150, 0, 3, 3)
+        love.graphics.draw(background, -350, backgroundTiltY, 0, 3, 3)
         love.graphics.setColor(0.2,0.2,0.2, 0.5)
         love.graphics.rectangle("fill", 0, 0, 640, 480)
         love.graphics.setColor(1,1,1)
@@ -133,8 +141,8 @@ function love.draw()
         progressX = 590
     end
 
-    love.graphics.draw(guitarist.currentFrame, 60, 200, 0, 3, 3)
-    love.graphics.draw(drummer.currentFrame, 400, 220, 0, 3, 3)
+    love.graphics.draw(guitarist.currentFrame, 60, playerTiltY, 0, 3, 3)
+    love.graphics.draw(drummer.currentFrame, 400, playerTiltY + 20, 0, 3, 3)
 
     love.graphics.rectangle("line", 30, 430, 590, 30)
 
@@ -157,7 +165,7 @@ function love.draw()
     love.graphics.print("Max Combo: " .. maxCombo, 400, 100)
     love.graphics.print(beatMap[beat], 300, 300)
  
-    for i = 4,#movingNotes,1 do
+    for i = noteOffset,#movingNotes,1 do
         if movingNotes[i] < 641 and movingNotes[i] > 20 then
             if beatMap[i] == "left" then
                 love.graphics.draw(leftNote, movingNotes[i], 30, 0, 2, 2)
@@ -202,18 +210,17 @@ end
 
 function buildNoteMap(numBeats)
     beatMap = {}
-    for i = 0,4,1 do
+    for i = 0, noteOffset, 1 do
         beatMap[i] = "rest"
     end
-    for i = 5,numBeats,1 do
-        randomBeat = love.math.random(0,10)
-        if randomBeat < 5 then
-            beatMap[i] = "rest"
-        elseif randomBeat >= 5 and randomBeat < 7.5 then
-            beatMap[i] = "left"
-        elseif randomBeat >= 7.5 then
-            beatMap[i] = "right"
-        end
+    for i = noteOffset, (numBeats/3), 1 do
+        generateNotes(i, 6, 7.5)
+    end
+    for i = (numBeats/3), (2*numBeats)/3, 1 do
+        generateNotes(i, 3, 6.5)
+    end
+    for i = ((2*numBeats)/3),numBeats,1 do
+        generateNotes(i, 2, 6)
     end
     return beatMap
 end
@@ -255,6 +262,18 @@ function checkNoteEnd(beat, subbeat, beatCounter)
     end
     return keypress, score, beatCounter, accuracy
 end
+
+function generateNotes(i, rest, left)
+    randomBeat = love.math.random(0,10)
+        if randomBeat < rest then
+            beatMap[i] = "rest"
+        elseif randomBeat >= rest and randomBeat < left then
+            beatMap[i] = "left"
+        elseif randomBeat >= left then
+            beatMap[i] = "right"
+        end
+    return beatMap[i]
+ end
 
 function love.keypressed(k)
     local beat, subbeat = music:getBeat()
