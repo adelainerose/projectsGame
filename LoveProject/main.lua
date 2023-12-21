@@ -1,5 +1,6 @@
 function love.load()
     lovebpm = require("Libraries/lovebpm")
+    functions = require("Libraries/functions")
 
     gameState = "playing"
     keypress = 0
@@ -52,7 +53,7 @@ function love.load()
     --:setBPM(lovebpm.detectBPM("Music/loop.ogg"))
     :setLooping(false)
     totalBeats = music:getTotalBeats()
-    buildNoteMap(totalBeats)
+    functions.buildNoteMap(totalBeats)
     music:play()
     music:on("beat", function(n)
         local beat, subbeat = music:getBeat()
@@ -199,82 +200,6 @@ function animate(character)
     end
 end
 
-function playSound(sound1, sound2)
-    soundContainer = love.math.random(1,9)
-    if soundContainer <= 3 then
-        sound1:play()
-    elseif soundContainer > 3 then
-        sound2:play()
-    end
-end
-
-function buildNoteMap(numBeats)
-    beatMap = {}
-    for i = 0, noteOffset, 1 do
-        beatMap[i] = "rest"
-    end
-    for i = noteOffset, (numBeats/3), 1 do
-        generateNotes(i, 6, 7.5)
-    end
-    for i = (numBeats/3), (2*numBeats)/3, 1 do
-        generateNotes(i, 3, 6.5)
-    end
-    for i = ((2*numBeats)/3),numBeats,1 do
-        generateNotes(i, 2, 6)
-    end
-    return beatMap
-end
-
-function checkNoteFront(beat, subbeat, beatCounter)
-    if subbeat < .2 then
-        if beatCounter ~= beat then
-            keypress = keypress + 1
-            score = score + 1
-            accuracy = "Perfect!"
-        end
-    elseif subbeat < .4 then
-        if beatCounter ~= beat then
-            keypress = keypress + 1
-            score = score + 1
-            accuracy = "Great!"
-        end
-    end
-    return keypress, score, accuracy
-end
-
-function checkNoteEnd(beat, subbeat, beatCounter)
-    if subbeat > .8 then
-        if beatCounter ~= beat then
-            keypress = keypress + 1
-            score = score + 1
-            accuracy = "Perfect!"
-        end
-    elseif subbeat > .6 then
-        if beatCounter ~= beat then
-            keypress = keypress + 1
-            score = score + 1
-            accuracy = "Great!"
-        end
-    elseif subbeat <= 0.6 and subbeat >= 0.4 then
-        keypress = 0
-        accuracy = "Bad."
-        score = score - 1
-    end
-    return keypress, score, beatCounter, accuracy
-end
-
-function generateNotes(i, rest, left)
-    randomBeat = love.math.random(0,10)
-        if randomBeat < rest then
-            beatMap[i] = "rest"
-        elseif randomBeat >= rest and randomBeat < left then
-            beatMap[i] = "left"
-        elseif randomBeat >= left then
-            beatMap[i] = "right"
-        end
-    return beatMap[i]
- end
-
 function love.keypressed(k)
     local beat, subbeat = music:getBeat()
 
@@ -291,10 +216,10 @@ function love.keypressed(k)
     if k == "f" and gameState == "playing" or gameState == "Turbo" then
         kickDrumSFX:play()
         if beatMap[beat] == "left" then
-            checkNoteFront(beat, subbeat, beatCounter)
-            checkNoteEnd(beat, subbeat, beatCounter)
+            functions.checkNoteFront(beat, subbeat, beatCounter)
+            functions.checkNoteEnd(beat, subbeat, beatCounter)
         elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "left" then
-            checkNoteEnd(beat, subbeat, beatCounter)
+            functions.checkNoteEnd(beat, subbeat, beatCounter)
         -- else
         --     beatCounter = beat
         --     keypress = 0
@@ -307,10 +232,10 @@ function love.keypressed(k)
     if k == "j" and gameState == "playing" or gameState == "Turbo" then
         drumHitSFX:play()
         if beatMap[beat] == "right" then
-            checkNoteFront(beat, subbeat, beatCounter)
-            checkNoteEnd(beat, subbeat, beatCounter)
+            functions.checkNoteFront(beat, subbeat, beatCounter)
+            functions.checkNoteEnd(beat, subbeat, beatCounter)
         elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "right" then
-            checkNoteEnd(beat, subbeat, beatCounter)
+            functions.checkNoteEnd(beat, subbeat, beatCounter)
         -- else
         --     beatCounter = beat
         --     keypress = 0
