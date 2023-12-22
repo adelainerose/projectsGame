@@ -30,7 +30,7 @@ function functions.buildNoteMap(numBeats)
 end
 
 function functions.checkNoteFront(beat, subbeat, beatCounter)
-    if subbeat < .2 then
+    if subbeat < .1 then
         if beatCounter ~= beat then
             keypress = keypress + 1
             score = score + 1
@@ -47,7 +47,7 @@ function functions.checkNoteFront(beat, subbeat, beatCounter)
 end
 
 function functions.checkNoteEnd(beat, subbeat, beatCounter)
-    if subbeat > .8 then
+    if subbeat > .9 then
         if beatCounter ~= beat then
             keypress = keypress + 1
             score = score + 1

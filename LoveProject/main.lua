@@ -218,14 +218,21 @@ function love.keypressed(k)
         if beatMap[beat] == "left" then
             functions.checkNoteFront(beat, subbeat, beatCounter)
             functions.checkNoteEnd(beat, subbeat, beatCounter)
+        elseif beatMap[beat] == "right" then
+            beatCounter = beat
+            keypress = 0
+            accuracy = "Miss"
+            score = score - 1
         elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "left" then
             functions.checkNoteEnd(beat, subbeat, beatCounter)
-        -- else
-        --     beatCounter = beat
-        --     keypress = 0
-        --     accuracy = "Miss"
-        --     score = score - 1
+        elseif beatMap[beat] == "rest" and beatMap[beat - 1] == "left" then
+            functions.checkNoteFront(beat, subbeat, beatCounter)
+        -- elseif beatMap[beat] == "right" and beatCounter == beat and beatMap[beat + 1] == "left" then
+        --     functions.checkNoteEnd(beat, subbeat, beatCounter)
+        -- elseif beatMap[beat] == "right" and beatMap[beat - 1] == "left" then
+        --     functions.checkNoteFront(beat, subbeat, beatCounter)
         end
+        
         beatCounter = beat
     end
 
@@ -234,13 +241,19 @@ function love.keypressed(k)
         if beatMap[beat] == "right" then
             functions.checkNoteFront(beat, subbeat, beatCounter)
             functions.checkNoteEnd(beat, subbeat, beatCounter)
+        elseif beatMap[beat] == "left" then
+            beatCounter = beat
+            keypress = 0
+            accuracy = "Miss"
+            score = score - 1
         elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "right" then
             functions.checkNoteEnd(beat, subbeat, beatCounter)
-        -- else
-        --     beatCounter = beat
-        --     keypress = 0
-        --     accuracy = "Miss"
-        --     score = score - 1
+        elseif beatMap[beat] == "rest" and beatMap[beat - 1] == "right" then
+            functions.checkNoteFront(beat, subbeat, beatCounter)
+        -- elseif beatMap[beat] == "left" and beatCounter == beat and beatMap[beat + 1] == "right" then
+        --     functions.checkNoteEnd(beat, subbeat, beatCounter)
+        -- elseif beatMap[beat] == "left" and beatMap[beat - 1] == "right" then
+        --     functions.checkNoteFront(beat, subbeat, beatCounter)
         end
         beatCounter = beat
     end
