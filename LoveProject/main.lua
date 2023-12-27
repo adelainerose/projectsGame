@@ -15,6 +15,7 @@ function love.load()
     noteOffset = 4
     backgroundPanX = -56
     titlePanX = -64
+    keyHit = false
 
     kickDrumSFX = love.audio.newSource("Sound/Drummer/kick-drum.mp3", "static")
     kickDrumSFX:setVolume(8)
@@ -67,7 +68,10 @@ end
 function love.update(dt)
     music:update()
     local beat, subbeat = music:getBeat()
-
+    subbeatInt = string.sub(subbeat, 1, 3)
+    if subbeatInt == "0.5" then
+        keyHit = false
+    end
     if backgroundTiltY ~= -150 and gameState == "playing" then
         backgroundTiltY = backgroundTiltY + 1
         playerTiltY = playerTiltY + 1
@@ -159,7 +163,9 @@ function love.draw()
         love.graphics.print("Combo: " .. keypress, 10, 130)
         love.graphics.print(accuracy, 300, 10)
         love.graphics.print("Max Combo: " .. maxCombo, 400, 100)
-        love.graphics.print(beatMap[beat], 300, 300)
+        
+        love.graphics.print(subbeatInt, 100, 300)
+        love.graphics.print(tostring(keyHit), 300, 300)
     
         for i = noteOffset,#movingNotes,1 do
             if movingNotes[i] < 641 and movingNotes[i] > 20 then
@@ -190,7 +196,10 @@ function love.draw()
         music:stop()
         love.graphics.draw(splashScreen.background, backgroundPanX, 0, 0, 1.1, 1.1)
         love.graphics.draw(splashScreen.girls, titlePanX, 0, 0, 1.1, 1.1)
-        love.graphics.print("Press space to play!", 150, 150)
+        if titlePanX >= -32 then
+            love.graphics.draw(startButton, 192, 300, 0, 3, 3)
+            --love.graphics.print("Press space to play!", 150, 350)
+        end
     end
 
 end
@@ -219,49 +228,41 @@ function love.keypressed(k)
     if k == "f" and gameState == "playing" or gameState == "Turbo" then
         kickDrumSFX:play()
         if beatMap[beat] == "left" then
-            functions.checkNoteFront(beat, subbeat, beatCounter)
-            functions.checkNoteEnd(beat, subbeat, beatCounter)
-        elseif beatMap[beat] == "right" then
+            functions.checkNoteFront(beat, subbeat, keyHit)
+        elseif beatMap[beat] == "right" and beatMap[beat + 1] == "left" then
+            functions.checkNoteEnd(beat, subbeat, keyHit)
+        elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "left" then
+            functions.checkNoteEnd(beat, subbeat, keyHit)
+        else
             beatCounter = beat
             keypress = 0
             accuracy = "Miss"
             score = score - 1
-        elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "left" then
-            functions.checkNoteEnd(beat, subbeat, beatCounter)
-        elseif beatMap[beat] == "rest" and beatMap[beat - 1] == "left" then
-            functions.checkNoteFront(beat, subbeat, beatCounter)
-        -- elseif beatMap[beat] == "right" and beatCounter == beat and beatMap[beat + 1] == "left" then
-        --     functions.checkNoteEnd(beat, subbeat, beatCounter)
-        -- elseif beatMap[beat] == "right" and beatMap[beat - 1] == "left" then
-        --     functions.checkNoteFront(beat, subbeat, beatCounter)
         end
-        
         beatCounter = beat
+        keyHit = true
     end
 
     if k == "j" and gameState == "playing" or gameState == "Turbo" then
         drumHitSFX:play()
         if beatMap[beat] == "right" then
-            functions.checkNoteFront(beat, subbeat, beatCounter)
-            functions.checkNoteEnd(beat, subbeat, beatCounter)
-        elseif beatMap[beat] == "left" then
+            functions.checkNoteFront(beat, subbeat, keyHit)
+        elseif beatMap[beat] == "left" and beatMap[beat + 1] == "right" then
+            functions.checkNoteEnd(beat, subbeat, keyHit)
+        elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "right" then
+            functions.checkNoteEnd(beat, subbeat, keyHit)
+        else
             beatCounter = beat
             keypress = 0
             accuracy = "Miss"
             score = score - 1
-        elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "right" then
-            functions.checkNoteEnd(beat, subbeat, beatCounter)
-        elseif beatMap[beat] == "rest" and beatMap[beat - 1] == "right" then
-            functions.checkNoteFront(beat, subbeat, beatCounter)
-        -- elseif beatMap[beat] == "left" and beatCounter == beat and beatMap[beat + 1] == "right" then
-        --     functions.checkNoteEnd(beat, subbeat, beatCounter)
-        -- elseif beatMap[beat] == "left" and beatMap[beat - 1] == "right" then
-        --     functions.checkNoteFront(beat, subbeat, beatCounter)
         end
         beatCounter = beat
+        keyHit = true
     end
 
-    if k == "space" then
+    if k == "f" then
+        kickDrumSFX:play()
         if gameState == "Lose" or gameState == "Win" or gameState == "Start" then
             gameState = "playing"
             score = 35

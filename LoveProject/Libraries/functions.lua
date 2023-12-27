@@ -29,40 +29,35 @@ function functions.buildNoteMap(numBeats)
     return beatMap
 end
 
-function functions.checkNoteFront(beat, subbeat, beatCounter)
+function functions.checkNoteFront(beat, subbeat, keyHit)
     if subbeat < .1 then
-        if beatCounter ~= beat then
+        if keyHit == false then
             keypress = keypress + 1
             score = score + 1
             accuracy = "Perfect!"
         end
     elseif subbeat < .4 then
-        if beatCounter ~= beat then
+        if keyHit == false then
             keypress = keypress + 1
             score = score + 1
             accuracy = "Great!"
         end
     end
-    return keypress, score, accuracy
 end
 
-function functions.checkNoteEnd(beat, subbeat, beatCounter)
+function functions.checkNoteEnd(beat, subbeat, keyHit)
     if subbeat > .9 then
-        if beatCounter ~= beat then
+        if keyHit == false then
             keypress = keypress + 1
             score = score + 1
             accuracy = "Perfect!"
         end
-    elseif subbeat > .6 then
+    elseif keyHit == false then
         if beatCounter ~= beat then
             keypress = keypress + 1
             score = score + 1
             accuracy = "Great!"
         end
-    elseif subbeat <= 0.6 and subbeat >= 0.4 then
-        keypress = 0
-        accuracy = "Bad."
-        score = score - 1
     end
 end
 
@@ -110,6 +105,9 @@ function functions.initSprites()
     rightNote:setFilter("linear", "nearest")
     noteTarget = love.graphics.newImage("Sprites/UI/note-target.png")
     noteTarget:setFilter("linear", "nearest")
+
+    startButton = love.graphics.newImage("Sprites/UI/start-button.png")
+    startButton:setFilter("linear", "nearest")
 
 end
 
