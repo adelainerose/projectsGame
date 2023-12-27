@@ -66,4 +66,51 @@ function functions.checkNoteEnd(beat, subbeat, beatCounter)
     end
 end
 
- return functions
+function functions.initSprites()
+    background = love.graphics.newImage("Sprites/projects-background.png")
+    background:setFilter("linear", "nearest")
+
+    guitarist = {}
+    guitarist.frame0 = love.graphics.newImage("Sprites/guitarist/sprite_0.png")
+    guitarist.frame0:setFilter("linear", "nearest")
+    guitarist.frame1 = love.graphics.newImage("Sprites/guitarist/sprite_1.png")
+    guitarist.frame1:setFilter("linear", "nearest")
+    guitarist.currentFrame = guitarist.frame1
+
+    drummer = {}
+    drummer.frame0 = love.graphics.newImage("Sprites/drummer/sprite_0.png")
+    drummer.frame0:setFilter("linear", "nearest")
+    drummer.frame1 = love.graphics.newImage("Sprites/drummer/sprite_1.png")
+    drummer.frame1:setFilter("linear", "nearest")
+    drummer.currentFrame = drummer.frame1
+
+    bassist = {}
+    bassist.frame0 = love.graphics.newImage("Sprites/bassist/sprite_0.png")
+    bassist.frame0:setFilter("linear", "nearest")
+    bassist.frame1 = love.graphics.newImage("Sprites/bassist/sprite_1.png")
+    bassist.frame1:setFilter("linear", "nearest")
+    bassist.currentFrame = bassist.frame1
+
+    singer = {}
+    singer.frame0 = love.graphics.newImage("Sprites/singer/sprite_0.png")
+    singer.frame0:setFilter("linear", "nearest")
+    singer.frame1 = love.graphics.newImage("Sprites/singer/sprite_1.png")
+    singer.frame1:setFilter("linear", "nearest")
+    singer.currentFrame = singer.frame1
+
+    splashScreen = {}
+    splashScreen.background = love.graphics.newImage("Sprites/Title/title-background.png")
+    splashScreen.background:setFilter("linear", "nearest")
+    splashScreen.girls = love.graphics.newImage("Sprites/Title/title-girls.png")
+    splashScreen.girls:setFilter("linear", "nearest")
+
+    leftNote = love.graphics.newImage("Sprites/UI/notes/left-note.png")
+    leftNote:setFilter("linear", "nearest")
+    rightNote = love.graphics.newImage("Sprites/UI/notes/right-note.png")
+    rightNote:setFilter("linear", "nearest")
+    noteTarget = love.graphics.newImage("Sprites/UI/note-target.png")
+    noteTarget:setFilter("linear", "nearest")
+
+end
+
+return functions
