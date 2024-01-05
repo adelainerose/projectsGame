@@ -4,7 +4,7 @@ function love.load()
 
     gameState = "Start"
     keypress = 0
-    score = 35
+    score = 40
     beatCounter = 0
     accuracy = " "
     maxCombo = 0
@@ -69,7 +69,7 @@ function love.update(dt)
     music:update()
     local beat, subbeat = music:getBeat()
     subbeatInt = string.sub(subbeat, 1, 3)
-    if subbeatInt == "0.5" then
+    if subbeatInt == "0.4" then
         keyHit = false
     end
     if backgroundTiltY ~= -150 and gameState == "playing" then
@@ -163,9 +163,7 @@ function love.draw()
         love.graphics.print("Combo: " .. keypress, 10, 130)
         love.graphics.print(accuracy, 300, 10)
         love.graphics.print("Max Combo: " .. maxCombo, 400, 100)
-        
-        love.graphics.print(subbeatInt, 100, 300)
-        love.graphics.print(tostring(keyHit), 300, 300)
+        love.graphics.print(tostring(keyHit), 400, 400)
     
         for i = noteOffset,#movingNotes,1 do
             if movingNotes[i] < 641 and movingNotes[i] > 20 then
@@ -227,7 +225,9 @@ function love.keypressed(k)
 
     if k == "f" and gameState == "playing" or gameState == "Turbo" then
         kickDrumSFX:play()
-        if beatMap[beat] == "left" then
+        if beatMap[beat] == "left" and beatMap[beat + 1] == "left" then
+            functions.checkFullNote(beat, subbeat, keyHit)
+        elseif beatMap[beat] == "left" and beatMap[beat + 1] ~= "left" then
             functions.checkNoteFront(beat, subbeat, keyHit)
         elseif beatMap[beat] == "right" and beatMap[beat + 1] == "left" then
             functions.checkNoteEnd(beat, subbeat, keyHit)
@@ -245,7 +245,9 @@ function love.keypressed(k)
 
     if k == "j" and gameState == "playing" or gameState == "Turbo" then
         drumHitSFX:play()
-        if beatMap[beat] == "right" then
+        if beatMap[beat] == "right" and beatMap[beat + 1] == "right" then
+            functions.checkFullNote(beat, subbeat, keyHit)
+        elseif beatMap[beat] == "right" and beatMap[beat + 1] ~= "right" then
             functions.checkNoteFront(beat, subbeat, keyHit)
         elseif beatMap[beat] == "left" and beatMap[beat + 1] == "right" then
             functions.checkNoteEnd(beat, subbeat, keyHit)

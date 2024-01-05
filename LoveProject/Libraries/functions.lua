@@ -30,18 +30,23 @@ function functions.buildNoteMap(numBeats)
 end
 
 function functions.checkNoteFront(beat, subbeat, keyHit)
-    if subbeat < .1 then
+    if subbeat < .2 then
         if keyHit == false then
             keypress = keypress + 1
             score = score + 1
             accuracy = "Perfect!"
         end
-    elseif subbeat < .4 then
+    elseif subbeat < .6 then
         if keyHit == false then
             keypress = keypress + 1
             score = score + 1
             accuracy = "Great!"
         end
+    elseif subbeat >= .6 then
+        beatCounter = beat
+        keypress = 0
+        accuracy = "Miss"
+        score = score - 1
     end
 end
 
@@ -52,14 +57,54 @@ function functions.checkNoteEnd(beat, subbeat, keyHit)
             score = score + 1
             accuracy = "Perfect!"
         end
-    elseif keyHit == false then
-        if beatCounter ~= beat then
+    elseif subbeat > 0.7 then
+        if keyHit == false then
             keypress = keypress + 1
             score = score + 1
             accuracy = "Great!"
         end
+    elseif subbeat <= 0.7 then
+        beatCounter = beat
+        keypress = 0
+        accuracy = "Miss"
+        score = score - 1
     end
 end
+
+function functions.checkFullNote(beat, subbeat, keyHit)
+    if subbeat < .2 then
+        if keyHit == false then
+            keypress = keypress + 1
+            score = score + 1
+            accuracy = "Perfect!"
+        end
+    elseif subbeat < .6 then
+        if keyHit == false then
+            keypress = keypress + 1
+            score = score + 1
+            accuracy = "Great!"
+        end
+    elseif subbeat > .9 then
+        if keyHit == false then
+            keypress = keypress + 1
+            score = score + 1
+            accuracy = "Perfect!"
+        end
+    elseif subbeat > .7 then
+        if keyHit == false then
+            keypress = keypress + 1
+            score = score + 1
+            accuracy = "Great!"
+        end
+    else
+        beatCounter = beat
+        keypress = 0
+        accuracy = "Miss"
+        score = score - 1
+    end
+end
+
+
 
 function functions.initSprites()
     background = love.graphics.newImage("Sprites/projects-background.png")
