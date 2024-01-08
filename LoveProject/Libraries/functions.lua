@@ -21,10 +21,10 @@ function functions.buildNoteMap(numBeats)
         functions.generateNotes(i, 6, 7.5)
     end
     for i = (numBeats/3), (2*numBeats)/3, 1 do
-        functions.generateNotes(i, 3, 6.5)
+        functions.generateNotes(i, 4, 7)
     end
     for i = ((2*numBeats)/3),numBeats,1 do
-        functions.generateNotes(i, 2, 6)
+        functions.generateNotes(i, 3, 6.5)
     end
     return beatMap
 end

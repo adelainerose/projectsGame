@@ -181,13 +181,13 @@ function love.draw()
         music:stop()
         love.graphics.clear()
         love.graphics.print("You lose.", 150, 10)
-        love.graphics.print("Press space to play again!", 150, 150)
+        love.graphics.print("Press L to play again!", 150, 150)
     end
     if gameState == "Win" then
         music:stop()
         love.graphics.clear()
         love.graphics.print("You Win!", 150, 10)
-        love.graphics.print("Press space to play again!", 150, 150)
+        love.graphics.print("Press L to play again!", 150, 150)
     end
     
     if gameState == "Start" then
@@ -223,7 +223,7 @@ function love.keypressed(k)
       end
     end
 
-    if k == "f" and gameState == "playing" or gameState == "Turbo" then
+    if k == "f" and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
         kickDrumSFX:play()
         if beatMap[beat] == "left" and beatMap[beat + 1] == "left" then
             functions.checkFullNote(beat, subbeat, keyHit)
@@ -243,7 +243,7 @@ function love.keypressed(k)
         keyHit = true
     end
 
-    if k == "j" and gameState == "playing" or gameState == "Turbo" then
+    if k == "j" and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
         drumHitSFX:play()
         if beatMap[beat] == "right" and beatMap[beat + 1] == "right" then
             functions.checkFullNote(beat, subbeat, keyHit)
@@ -267,7 +267,7 @@ function love.keypressed(k)
         kickDrumSFX:play()
         if gameState == "Lose" or gameState == "Win" or gameState == "Start" then
             gameState = "playing"
-            score = 35
+            score = 40
             keypress = 0
             maxCombo = 0
             beatCounter = 0
