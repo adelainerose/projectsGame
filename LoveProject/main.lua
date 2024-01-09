@@ -1,7 +1,8 @@
 function love.load()
     lovebpm = require("Libraries/lovebpm")
     functions = require("Libraries/functions")
-
+    gpioFunctions = require("Libraries/gpioFunctions")
+    GPIO = require('periphery').GPIO
     gameState = "Start"
     keypress = 0
     score = 40
@@ -11,7 +12,7 @@ function love.load()
     movingNotes = {}
     noteVelocity = {}
     backgroundTiltY = -250
-    playerTiltY = 100
+    playerTiltY = 100 
     noteOffset = 4
     backgroundPanX = -56
     titlePanX = -64
@@ -163,7 +164,9 @@ function love.draw()
         love.graphics.print("Combo: " .. keypress, 10, 130)
         love.graphics.print(accuracy, 300, 10)
         love.graphics.print("Max Combo: " .. maxCombo, 400, 100)
-        love.graphics.print(tostring(keyHit), 400, 400)
+
+        gpioFunctions.readPin(GPIO)
+        love.graphics.print(tostring(gpioValue), 400, 400)
     
         for i = noteOffset,#movingNotes,1 do
             if movingNotes[i] < 641 and movingNotes[i] > 20 then
