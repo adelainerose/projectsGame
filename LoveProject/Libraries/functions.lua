@@ -104,6 +104,25 @@ function functions.checkFullNote(beat, subbeat, keyHit)
     end
 end
 
+function functions.scoreLeftNote(beatMap, beat, subbeat, keyHit)
+    kickDrumSFX:play()
+    if beatMap[beat] == "left" and beatMap[beat + 1] == "left" then
+        functions.checkFullNote(beat, subbeat, keyHit)
+    elseif beatMap[beat] == "left" and beatMap[beat + 1] ~= "left" then
+        functions.checkNoteFront(beat, subbeat, keyHit)
+    elseif beatMap[beat] == "right" and beatMap[beat + 1] == "left" then
+        functions.checkNoteEnd(beat, subbeat, keyHit)
+    elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "left" then
+        functions.checkNoteEnd(beat, subbeat, keyHit)
+    else
+        beatCounter = beat
+        keypress = 0
+        accuracy = "Miss"
+        score = score - 1
+    end
+    beatCounter = beat
+end
+
 
 
 function functions.initSprites()
