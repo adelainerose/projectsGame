@@ -123,7 +123,24 @@ function functions.scoreLeftNote(beatMap, beat, subbeat, keyHit)
     beatCounter = beat
 end
 
-
+function functions.scoreRightNote(beatMap, beat, subbeat, keyHit)
+    drumHitSFX:play()
+    if beatMap[beat] == "right" and beatMap[beat + 1] == "right" then
+        functions.checkFullNote(beat, subbeat, keyHit)
+    elseif beatMap[beat] == "right" and beatMap[beat + 1] ~= "right" then
+        functions.checkNoteFront(beat, subbeat, keyHit)
+    elseif beatMap[beat] == "left" and beatMap[beat + 1] == "right" then
+        functions.checkNoteEnd(beat, subbeat, keyHit)
+    elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "right" then
+        functions.checkNoteEnd(beat, subbeat, keyHit)
+    else
+        beatCounter = beat
+        keypress = 0
+        accuracy = "Miss"
+        score = score - 1
+    end
+    beatCounter = beat
+end
 
 function functions.initSprites()
     background = love.graphics.newImage("Sprites/projects-background.png")

@@ -90,6 +90,10 @@ function love.update(dt)
         movingNotes[i] = movingNotes[i] - noteVelocity[i]
     end
 
+    if beatMap[beat - 1] == "rest" and beatMap[beat] == "rest" then
+        accuracy = " "
+    end
+
     if beatCounter + 1 < beat and gameState == "playing" and beatMap[beat] ~= "rest" then
         accuracy = "Miss"
         keypress = 0
@@ -116,11 +120,28 @@ function love.update(dt)
     end
 
     gpioFunctions.readLeftButton(GPIO)
-    if lbValue == true and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
-        if keyHit == false then
-            functions.scoreLeftNote(beatMap, beat, subbeat, keyHit)
-            keyHit = true
+    if lbValue == true then
+        if gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
+            if keyHit == false then
+                functions.scoreLeftNote(beatMap, beat, subbeat, keyHit)
+            end
+        elseif gameState == "Lose" or gameState == "Win" or gameState == "Start" then
+            gameState = "playing"
+            score = 40
+            keypress = 0
+            maxCombo = 0
+            beatCounter = beat
+            music:play(true)
         end
+        keyHit = true
+    end
+
+    gpioFunctions.readRightButton(GPIO)
+    if rbValue == true and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
+        if keyHit == false then
+            functions.scoreRightNote(beatMap, beat, subbeat, keyHit)
+        end
+        keyHit = true
     end
 
     music:on("end", function()
@@ -237,22 +258,7 @@ function love.keypressed(k)
     end
 
     if k == "j" and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
-        drumHitSFX:play()
-        if beatMap[beat] == "right" and beatMap[beat + 1] == "right" then
-            functions.checkFullNote(beat, subbeat, keyHit)
-        elseif beatMap[beat] == "right" and beatMap[beat + 1] ~= "right" then
-            functions.checkNoteFront(beat, subbeat, keyHit)
-        elseif beatMap[beat] == "left" and beatMap[beat + 1] == "right" then
-            functions.checkNoteEnd(beat, subbeat, keyHit)
-        elseif beatMap[beat] == "rest" and beatMap[beat + 1] == "right" then
-            functions.checkNoteEnd(beat, subbeat, keyHit)
-        else
-            beatCounter = beat
-            keypress = 0
-            accuracy = "Miss"
-            score = score - 1
-        end
-        beatCounter = beat
+        functions.scoreRightNote(beatMap, beat, subbeat, keyHit)
         keyHit = true
     end
 
