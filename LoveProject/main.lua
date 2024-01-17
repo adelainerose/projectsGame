@@ -17,6 +17,8 @@ function love.load()
     backgroundPanX = -56
     titlePanX = -64
     keyHit = false
+    lbHit = false
+    rbHit = false
 
     kickDrumSFX = love.audio.newSource("Sound/Drummer/kick-drum.mp3", "static")
     kickDrumSFX:setVolume(8)
@@ -111,7 +113,7 @@ function love.update(dt)
     if score >= 100 then
         gameState = "Turbo"
     end
-    if score <100 and score > 0 and gameState ~= "Start" then
+    if score <100 and score > 0 and gameState ~= "Start" and gameState ~= "RFID" then
         gameState = "playing"
     end
 
@@ -121,27 +123,38 @@ function love.update(dt)
 
     gpioFunctions.readLeftButton(GPIO)
     if lbValue == true then
-        if gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
-            if keyHit == false then
+        if gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" and gameState ~= "RFID" then
+            if keyHit == false and lbHit == false then
                 functions.scoreLeftNote(beatMap, beat, subbeat, keyHit)
             end
         elseif gameState == "Lose" or gameState == "Win" or gameState == "Start" then
-            gameState = "playing"
-            score = 40
-            keypress = 0
-            maxCombo = 0
-            beatCounter = beat
-            music:play(true)
+            gameState = "RFID"
+        -- elseif gameState == "RFID" then
+            --gameState = "playing"
+            -- score = 40
+            -- keypress = 0
+            -- maxCombo = 0
+            -- beatCounter = beat
+            --music:play(true)
         end
+        
         keyHit = true
+        lbHit = true
+    end
+    if lbValue == false then
+        lbHit = false
     end
 
     gpioFunctions.readRightButton(GPIO)
     if rbValue == true and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
-        if keyHit == false then
+        if keyHit == false and rbHit == false then
             functions.scoreRightNote(beatMap, beat, subbeat, keyHit)
         end
         keyHit = true
+        rbHit = true
+    end
+    if rbValue == false then
+        rbHit = false
     end
 
     music:on("end", function()
@@ -150,7 +163,10 @@ function love.update(dt)
     end)
 end
 
-function love.draw()    
+function love.draw()  
+
+    love.graphics.setFont(love.graphics.newFont(25))
+
     if gameState == "playing" then
         love.graphics.draw(background, -350, backgroundTiltY, 0, 3, 3)
         love.graphics.setColor(0.2,0.2,0.2, 0.5)
@@ -188,7 +204,6 @@ function love.draw()
 
         local beat, subbeat = music:getBeat()
         --love.graphics.print(beat, 500, 10)
-        love.graphics.setFont(love.graphics.newFont(25))
         love.graphics.print("Combo: " .. keypress, 10, 130)
         love.graphics.print(accuracy, 300, 10)
         love.graphics.print("Max Combo: " .. maxCombo, 400, 100)
@@ -229,6 +244,12 @@ function love.draw()
             --love.graphics.print("Press space to play!", 150, 350)
         end
     end
+
+    if gameState == "RFID" then
+        love.graphics.clear()
+        love.graphics.print("Scan RFID now!", 150, 350)
+    end
+
 end
 
 function animate(character)
