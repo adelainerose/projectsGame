@@ -3,6 +3,7 @@ function love.load()
     functions = require("Libraries/functions")
     gpioFunctions = require("Libraries/gpioFunctions")
     GPIO = require('periphery').GPIO
+    socket = require("socket")
     gameState = "Start"
     keypress = 0
     score = 40
