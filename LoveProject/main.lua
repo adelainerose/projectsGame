@@ -20,7 +20,7 @@ function love.load()
     keyHit = false
     lbHit = false
     rbHit = false
-    rfidResponse = "nothing yet!"
+    rfidResponse = " "
 
     kickDrumSFX = love.audio.newSource("Sound/Drummer/kick-drum.mp3", "static")
     kickDrumSFX:setVolume(8)
@@ -248,13 +248,18 @@ function love.draw()
     end
 
     if gameState == "RFID" then
-        love.graphics.clear()
-        love.graphics.print("Scan RFID now!", 150, 350)
-		myclient = socket.connect('localhost', 12346)
-		myclient:send("RFID\n")
-		rfidResponse = myclient:receive('*l')
-		--myclient:close()
-        love.graphics.print(rfidResponse, 150, 500)
+        if rfidResponse == " " then
+            love.graphics.clear()
+            love.graphics.print("Scan RFID now!", 150, 350)
+            myclient = socket.connect('localhost', 12346)
+            myclient:send("RFID\n")
+		    rfidResponse = myclient:receive('*l')
+            return rfidResponse
+        end
+        if rfidResponse ~= " " then
+		    myclient:close()
+            love.graphics.print(rfidResponse, 150, 500)
+        end
     end
 
 end
