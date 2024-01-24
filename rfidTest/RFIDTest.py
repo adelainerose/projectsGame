@@ -27,6 +27,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 id, text = reader.read()
                 print(text)
                 conn.sendall((str(text) + '\n').encode('utf-8'))
+                print("sent!")
             else:
                 break
             
