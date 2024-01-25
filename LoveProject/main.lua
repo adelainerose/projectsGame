@@ -253,6 +253,7 @@ function love.draw()
         love.graphics.clear()
         love.graphics.print("Scan RFID now!", 150, 350)
         love.graphics.print(rfidResponse, 150, 200)
+
         if rfidResponse == "waiting" then
             myclient:send("RFID\n")
 		    rfidResponse = myclient:receive('*l')
