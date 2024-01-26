@@ -1,19 +1,20 @@
 import time
 import socket
 from mfrc522 import SimpleMFRC522
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 
 #reader object
 reader = SimpleMFRC522()
 
 HOST = "127.0.0.1"
-PORT = 12346
+PORT = 12345
+
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
     s.listen()
     conn, addr = s.accept()
-    
+ 
     with conn:
         print("connected by", addr)
         while True:
