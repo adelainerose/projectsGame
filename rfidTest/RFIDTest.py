@@ -40,6 +40,7 @@ try:
             txt = input("Input your text: ")
             print("place card on reader")
             reader.write(txt)
+            print("done!")
             time.sleep(1)
         if cmd == "R":
             print("place card on reader")

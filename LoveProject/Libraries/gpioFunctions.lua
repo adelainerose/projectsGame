@@ -12,6 +12,6 @@ function gpioFunctions.readRightButton(GPIO)
     rbValue = gpio_in:read()
     gpio_in:close()
     return rbValue
-end
+end    
 
 return gpioFunctions

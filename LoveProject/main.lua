@@ -96,34 +96,13 @@ function love.update(dt)
         movingNotes[i] = movingNotes[i] - noteVelocity[i]
     end
 
-    if beatMap[beat - 1] == "rest" and beatMap[beat] == "rest" then
-        accuracy = " "
-    end
+    functions.checkMiss(beatMap, beat, accuracy, keypress)
 
-    if beatCounter + 1 < beat and gameState == "playing" and beatMap[beat] ~= "rest" then
-        accuracy = "Miss"
-        keypress = 0
-    end
-    if beatCounter + 1 < beat and gameState == "Turbo" and beatMap[beat] ~= "rest" then
-        accuracy = "Miss"
-        keypress = 0
-    end
     if keypress > maxCombo then
         maxCombo = keypress
     end
-    if score <= 0 then
-        gameState = "Lose"
-    end
-    if score >= 100 then
-        gameState = "Turbo"
-    end
-    if score <100 and score > 0 and gameState ~= "Start" and gameState ~= "RFID" then
-        gameState = "playing"
-    end
-
-    if beatCounter + 1 >= totalBeats then
-        gameState = "Win"
-    end
+    
+    functions.checkWinState(score, gameState, beatCounter, totalBeats)
 
     gpioFunctions.readLeftButton(GPIO)
     if lbValue == true then
@@ -133,22 +112,21 @@ function love.update(dt)
             end
         elseif gameState == "Lose" or gameState == "Win" or gameState == "Start" then
             gameState = "RFID"
-        -- elseif gameState == "RFID" then
-            --gameState = "playing"
-            -- score = 40
-            -- keypress = 0
-            -- maxCombo = 0
-            -- beatCounter = beat
-            --music:play(true)
+        elseif gameState == "RFID" and rfidResponse ~= "waiting" then
+            gameState = "playing"
+            score = 40
+            keypress = 0
+            maxCombo = 0
+            beatCounter = beat
+            accuracy = "Perfect!"
+            music:play(true)
         end
-        
         keyHit = true
         lbHit = true
     end
     if lbValue == false then
         lbHit = false
     end
-
     gpioFunctions.readRightButton(GPIO)
     if rbValue == true and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
         if keyHit == false and rbHit == false then
@@ -249,18 +227,19 @@ function love.draw()
     end
 
     if gameState == "RFID" then
-        love.graphics.clear()
-        love.graphics.print("Scan RFID now!", 150, 350)
-        love.graphics.print(rfidResponse, 150, 200)
-        love.graphics.present()
         if rfidResponse == "waiting" then
+            love.graphics.clear()
+            love.graphics.print("Scan RFID now!", 150, 350)
+            love.graphics.print(rfidResponse, 150, 200)
+            love.graphics.present()
             myclient:send("RFID\n")
 		    rfidResponse = myclient:receive('*l')
-            --return rfidResponse
+            return rfidResponse
         end
         if rfidResponse ~= "waiting" then
-		    myclient:send("RFID\n")
-		    rfidResponse = myclient:receive('*l')
+            love.graphics.clear()
+            love.graphics.print(rfidResponse, 150, 200)
+            myclient:close()
         end
     end
 

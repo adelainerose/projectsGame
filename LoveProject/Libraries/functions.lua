@@ -142,6 +142,39 @@ function functions.scoreRightNote(beatMap, beat, subbeat, keyHit)
     beatCounter = beat
 end
 
+function functions.checkMiss(beatMap, beat, accuracy, keypress)
+    if beatMap[beat - 1] == "rest" and beatMap[beat] == "rest" then
+        accuracy = " "
+    end
+
+    if beatCounter + 1 < beat and gameState == "playing" and beatMap[beat] ~= "rest" then
+        accuracy = "Miss"
+        keypress = 0
+    end
+    if beatCounter + 1 < beat and gameState == "Turbo" and beatMap[beat] ~= "rest" then
+        accuracy = "Miss"
+        keypress = 0
+    end
+    return accuracy, keypress
+end
+
+function functions.checkWinState(score, gameState, beatCounter, totalBeats)
+    if score <= 0 then
+        gameState = "Lose"
+    end
+    if score >= 100 then
+        gameState = "Turbo"
+    end
+    if score <100 and score > 0 and gameState ~= "Start" and gameState ~= "RFID" then
+        gameState = "playing"
+    end
+
+    if beatCounter + 1 >= totalBeats then
+        gameState = "Win"
+    end
+    return gameState
+end
+
 function functions.initSprites()
     background = love.graphics.newImage("Sprites/projects-background.png")
     background:setFilter("linear", "nearest")
