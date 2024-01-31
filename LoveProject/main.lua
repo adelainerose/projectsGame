@@ -24,14 +24,7 @@ function love.load()
     myclient = socket.connect('localhost', 12345)
     sentStatus = "false"
 
-    kickDrumSFX = love.audio.newSource("Sound/Drummer/kick-drum.mp3", "static")
-    kickDrumSFX:setVolume(8)
-    --snareDrumSFX = love.audio.newSource("Sound/Drummer/snare-drum.mp3", "static")
-    --snareDrumSFX:setVolume(8)
-    kickDrumSFX = love.audio.newSource("Sound/Drummer/kick-drum.mp3", "static")
-    kickDrumSFX:setVolume(8)
-    drumHitSFX = love.audio.newSource("Sound/Drummer/drum-hit.mp3", "static")
-    drumHitSFX:setVolume(8)
+    functions.initSFX()
 
     functions.initSprites()
 
@@ -266,12 +259,13 @@ function love.keypressed(k)
     end
 
     if k == "f" and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
-        kickDrumSFX:play()
+        guitarASFX:play()
         functions.scoreLeftNote(beatMap, beat, subbeat, keyHit)
         keyHit = true
     end
 
     if k == "j" and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
+        guitarESFX:play()
         functions.scoreRightNote(beatMap, beat, subbeat, keyHit)
         keyHit = true
     end
@@ -279,7 +273,7 @@ function love.keypressed(k)
     if k == "f" then
         kickDrumSFX:play()
         if gameState == "Lose" or gameState == "Win" or gameState == "Start" then
-            gameState = "RFID"
+            gameState = "playing"
             score = 40
             keypress = 0
             maxCombo = 0

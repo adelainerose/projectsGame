@@ -105,7 +105,6 @@ function functions.checkFullNote(beat, subbeat, keyHit)
 end
 
 function functions.scoreLeftNote(beatMap, beat, subbeat, keyHit)
-    kickDrumSFX:play()
     if beatMap[beat] == "left" and beatMap[beat + 1] == "left" then
         functions.checkFullNote(beat, subbeat, keyHit)
     elseif beatMap[beat] == "left" and beatMap[beat + 1] ~= "left" then
@@ -124,7 +123,6 @@ function functions.scoreLeftNote(beatMap, beat, subbeat, keyHit)
 end
 
 function functions.scoreRightNote(beatMap, beat, subbeat, keyHit)
-    drumHitSFX:play()
     if beatMap[beat] == "right" and beatMap[beat + 1] == "right" then
         functions.checkFullNote(beat, subbeat, keyHit)
     elseif beatMap[beat] == "right" and beatMap[beat + 1] ~= "right" then
@@ -223,6 +221,21 @@ function functions.initSprites()
     startButton = love.graphics.newImage("Sprites/UI/start-button.png")
     startButton:setFilter("linear", "nearest")
 
+end
+
+function functions.initSFX()
+    kickDrumSFX = love.audio.newSource("Sound/Drummer/kick-drum.mp3", "static")
+    kickDrumSFX:setVolume(8)
+    drumHitSFX = love.audio.newSource("Sound/Drummer/drum-hit.mp3", "static")
+    drumHitSFX:setVolume(8)
+    guitarASFX = love.audio.newSource("Sound/Guitarist/guitar-A.mp3", "static")
+    guitarASFX:setVolume(5)
+    guitarESFX = love.audio.newSource("Sound/Guitarist/guitar-E.mp3", "static")
+    guitarESFX:setVolume(5)
+    bassASFX = love.audio.newSource("Sound/Bassist/bass-A.mp3", "static")
+    bassASFX:setVolume(8)
+    bassESFX = love.audio.newSource("Sound/Bassist/bass-E.mp3", "static")
+    bassESFX:setVolume(8)
 end
 
 return functions
