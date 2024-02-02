@@ -156,23 +156,6 @@ function functions.checkMiss(beatMap, beat, accuracy, keypress)
     return accuracy, keypress
 end
 
-function functions.checkWinState(score, gameState, beatCounter, totalBeats)
-    if score <= 0 then
-        gameState = "Lose"
-    end
-    if score >= 100 then
-        gameState = "Turbo"
-    end
-    if score <100 and score > 0 and gameState ~= "Start" and gameState ~= "RFID" then
-        gameState = "playing"
-    end
-
-    if beatCounter + 1 >= totalBeats then
-        gameState = "Win"
-    end
-    return gameState
-end
-
 function functions.initSprites()
     background = love.graphics.newImage("Sprites/projects-background.png")
     background:setFilter("linear", "nearest")
@@ -229,13 +212,13 @@ function functions.initSFX()
     drumHitSFX = love.audio.newSource("Sound/Drummer/drum-hit.mp3", "static")
     drumHitSFX:setVolume(8)
     guitarASFX = love.audio.newSource("Sound/Guitarist/guitar-A.mp3", "static")
-    guitarASFX:setVolume(5)
+    guitarASFX:setVolume(.5)
     guitarESFX = love.audio.newSource("Sound/Guitarist/guitar-E.mp3", "static")
-    guitarESFX:setVolume(5)
+    guitarESFX:setVolume(.5)
     bassASFX = love.audio.newSource("Sound/Bassist/bass-A.mp3", "static")
-    bassASFX:setVolume(8)
+    bassASFX:setVolume(5)
     bassESFX = love.audio.newSource("Sound/Bassist/bass-E.mp3", "static")
-    bassESFX:setVolume(8)
+    bassESFX:setVolume(5)
 end
 
 return functions
