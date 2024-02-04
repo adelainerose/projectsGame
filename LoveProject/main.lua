@@ -1,8 +1,8 @@
 function love.load()
     lovebpm = require("Libraries/lovebpm")
     functions = require("Libraries/functions")
-    --gpioFunctions = require("Libraries/gpioFunctions")
-    --GPIO = require('periphery').GPIO
+    gpioFunctions = require("Libraries/gpioFunctions")
+    GPIO = require('periphery').GPIO
     socket = require("socket")
     gameState = "Start"
     keypress = 0
@@ -25,6 +25,7 @@ function love.load()
     sentStatus = "false"
 
     functions.initSFX()
+
     SFX1 = drumHitSFX
     SFX2 = kickDrumSFX
 
@@ -110,40 +111,40 @@ function love.update(dt)
         gameState = "Win"
     end
     
-    -- gpioFunctions.readLeftButton(GPIO)
-    -- if lbValue == true then
-    --     if gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" and gameState ~= "RFID" then
-    --         if keyHit == false and lbHit == false then
-    --             functions.scoreLeftNote(beatMap, beat, subbeat, keyHit)
-    --         end
-    --     elseif gameState == "Lose" or gameState == "Win" or gameState == "Start" then
-    --         gameState = "RFID"
-    --     elseif gameState == "RFID" and rfidResponse ~= "waiting" then
-    --         gameState = "playing"
-    --         score = 40
-    --         keypress = 0
-    --         maxCombo = 0
-    --         beatCounter = beat
-    --         accuracy = "Perfect!"
-    --         music:play(true)
-    --     end
-    --     keyHit = true
-    --     lbHit = true
-    -- end
-    -- if lbValue == false then
-    --     lbHit = false
-    -- end
-    -- gpioFunctions.readRightButton(GPIO)
-    -- if rbValue == true and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
-    --     if keyHit == false and rbHit == false then
-    --         functions.scoreRightNote(beatMap, beat, subbeat, keyHit)
-    --     end
-    --     keyHit = true
-    --     rbHit = true
-    -- end
-    -- if rbValue == false then
-    --     rbHit = false
-    -- end
+    gpioFunctions.readLeftButton(GPIO)
+    if lbValue == true then
+        if gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" and gameState ~= "RFID" then
+            if keyHit == false and lbHit == false then
+                functions.scoreLeftNote(beatMap, beat, subbeat, keyHit, SFX1)
+            end
+        elseif gameState == "Lose" or gameState == "Win" or gameState == "Start" then
+            gameState = "RFID"
+        elseif gameState == "RFID" and rfidResponse ~= "waiting" then
+            gameState = "playing"
+            score = 40
+            keypress = 0
+            maxCombo = 0
+            beatCounter = beat
+            accuracy = "Perfect!"
+            music:play(true)
+        end
+        keyHit = true
+        lbHit = true
+    end
+    if lbValue == false then
+        lbHit = false
+    end
+    gpioFunctions.readRightButton(GPIO)
+    if rbValue == true and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
+        if keyHit == false and rbHit == false then
+            functions.scoreRightNote(beatMap, beat, subbeat, keyHit, SFX2)
+        end
+        keyHit = true
+        rbHit = true
+    end
+    if rbValue == false then
+        rbHit = false
+    end
 
     music:on("end", function()
         gameState = "Win"
@@ -191,7 +192,7 @@ function love.draw()
         love.graphics.draw(noteTarget, (5), (62-45), 0, 2, 2)
 
         local beat, subbeat = music:getBeat()
-        love.graphics.print(score, 500, 10)
+        love.graphics.print(rfidResponse, 500, 10)
         love.graphics.print("Combo: " .. keypress, 10, 130)
         love.graphics.print(accuracy, 300, 10)
         love.graphics.print("Max Combo: " .. maxCombo, 400, 100)
@@ -245,17 +246,22 @@ function love.draw()
         if rfidResponse ~= "waiting" then
             love.graphics.clear()
             love.graphics.print(rfidResponse, 150, 200)
+            love.graphics.print(type(rfidResponse), 150, 250)
+            rfidLength = string.len(rfidResponse)
+            love.graphics.print(rfidLength, 150, 30)
+            if string.find(rfidResponse, "Nina") then
+                SFX1 = guitarASFX
+                SFX2 = guitarESFX
+                love.graphics.print("got here", 100, 100)
+                return SFX1, SFX2
+            elseif string.find(rfidResponse, "Susan") then
+                SFX1 = bassASFX
+                SFX2 = bassESFX
+            elseif string.find(rfidResponse, "Alex") then
+                SFX1 = drumHitSFX
+                SFX2 = kickDrumSFX
+            end
             myclient:close()
-        end
-        if rfidResponse == "Nina" then
-            SFX1 = guitarASFX
-            SFX2 = guitarESFX
-        elseif rfidResponse == "Susan" then
-            SFX1 = bassASFX
-            SFX2 = bassESFX
-        elseif rfidResponse == "Alex" then
-            SFX1 = drumHitSFX
-            SFX2 = kickDrumSFX
         end
     end
 
@@ -282,16 +288,12 @@ function love.keypressed(k)
     end
 
     if k == "f" and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
-        SFX1:stop()
-        SFX1:play()
-        functions.scoreLeftNote(beatMap, beat, subbeat, keyHit)
+        functions.scoreLeftNote(beatMap, beat, subbeat, keyHit, SFX1)
         keyHit = true
     end
 
     if k == "j" and gameState ~= "Lose" and gameState ~= "Win" and gameState ~= "Start" then
-        SFX2:stop()
-        SFX2:play()
-        functions.scoreRightNote(beatMap, beat, subbeat, keyHit)
+        functions.scoreRightNote(beatMap, beat, subbeat, keyHit, SFX2)
         keyHit = true
     end
 

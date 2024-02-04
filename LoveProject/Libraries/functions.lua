@@ -104,7 +104,9 @@ function functions.checkFullNote(beat, subbeat, keyHit)
     end
 end
 
-function functions.scoreLeftNote(beatMap, beat, subbeat, keyHit)
+function functions.scoreLeftNote(beatMap, beat, subbeat, keyHit, SFX1)
+    SFX1:stop()
+    SFX1:play()
     if beatMap[beat] == "left" and beatMap[beat + 1] == "left" then
         functions.checkFullNote(beat, subbeat, keyHit)
     elseif beatMap[beat] == "left" and beatMap[beat + 1] ~= "left" then
@@ -122,7 +124,9 @@ function functions.scoreLeftNote(beatMap, beat, subbeat, keyHit)
     beatCounter = beat
 end
 
-function functions.scoreRightNote(beatMap, beat, subbeat, keyHit)
+function functions.scoreRightNote(beatMap, beat, subbeat, keyHit, SFX2)
+    SFX2:stop()
+    SFX2:play()
     if beatMap[beat] == "right" and beatMap[beat + 1] == "right" then
         functions.checkFullNote(beat, subbeat, keyHit)
     elseif beatMap[beat] == "right" and beatMap[beat + 1] ~= "right" then
