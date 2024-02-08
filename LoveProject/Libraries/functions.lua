@@ -164,6 +164,9 @@ function functions.initSprites()
     background = love.graphics.newImage("Sprites/projects-background.png")
     background:setFilter("linear", "nearest")
 
+    spotlight = love.graphics.newImage("Sprites/UI/projects-spotlight-transparent.png")
+    spotlight:setFilter("linear", "nearest")
+
     guitarist = {}
     guitarist.frame0 = love.graphics.newImage("Sprites/guitarist/sprite_0.png")
     guitarist.frame0:setFilter("linear", "nearest")

@@ -22,7 +22,7 @@ function love.load()
     rbHit = false
     rfidResponse = "waiting"
     myclient = socket.connect('localhost', 12345)
-    sentStatus = "false"
+    spotlightX = -75
 
     functions.initSFX()
 
@@ -173,6 +173,8 @@ function love.draw()
     end
 
     if gameState == "playing" or gameState == "Turbo" then
+        love.graphics.draw(spotlight, spotlightX, backgroundTiltY, 0, 4, 4)
+
         love.graphics.draw(guitarist.currentFrame, 20, playerTiltY, 0, 3, 3)
         love.graphics.draw(drummer.currentFrame, 450, playerTiltY + 20, 0, 3, 3)
         love.graphics.draw(bassist.currentFrame, 300, playerTiltY + 20, 0, 2.7, 2.7)
@@ -182,6 +184,7 @@ function love.draw()
 
         love.graphics.rectangle("fill", 30, 430, progressX, 30)
 
+        
         love.graphics.setColor(0.5,0.5,0.5)
         love.graphics.rectangle("fill", 50, 30, 640, 64)
         love.graphics.setColor(0.21,0.21,0.21)
@@ -252,14 +255,17 @@ function love.draw()
             if string.find(rfidResponse, "Nina") then
                 SFX1 = guitarASFX
                 SFX2 = guitarESFX
-                love.graphics.print("got here", 100, 100)
-                return SFX1, SFX2
+                spotlightX = -210
             elseif string.find(rfidResponse, "Susan") then
                 SFX1 = bassASFX
                 SFX2 = bassESFX
+                spotlightX = 100
             elseif string.find(rfidResponse, "Alex") then
                 SFX1 = drumHitSFX
                 SFX2 = kickDrumSFX
+                spotlightX = 260
+            elseif string.find(rfidResponse, "Erika") then
+                spotlightX = -75
             end
             myclient:close()
         end
