@@ -248,30 +248,32 @@ function love.draw()
         end
         if rfidResponse ~= "waiting" then
             love.graphics.clear()
-            love.graphics.print(rfidResponse, 150, 200)
-            love.graphics.print(type(rfidResponse), 150, 250)
-            rfidLength = string.len(rfidResponse)
-            love.graphics.print(rfidLength, 150, 30)
+            love.graphics.print(rfidResponse, 20, 20)
+            love.graphics.print("Press L to continue!", 20, 50)
             if string.find(rfidResponse, "Nina") then
                 SFX1 = guitarASFX
                 SFX2 = guitarESFX
                 spotlightX = -210
+                love.graphics.draw(guitarist.currentFrame, 100, 100, 0, 5, 5)
             elseif string.find(rfidResponse, "Susan") then
                 SFX1 = bassASFX
                 SFX2 = bassESFX
                 spotlightX = 100
+                love.graphics.draw(bassist.currentFrame, 100, 100, 0, 5, 5)
             elseif string.find(rfidResponse, "Alex") then
                 SFX1 = drumHitSFX
                 SFX2 = kickDrumSFX
                 spotlightX = 260
+                love.graphics.draw(drummer.currentFrame, 100, 100, 0, 5, 5)
             elseif string.find(rfidResponse, "Erika") then
                 spotlightX = -75
+                love.graphics.draw(singer.currentFrame, 100, 200, 0, 5, 5)
             end
             myclient:close()
         end
     end
-
 end
+
 
 function animate(character)
     if character.currentFrame == character.frame0 then
