@@ -92,7 +92,19 @@ function love.update(dt)
         movingNotes[i] = movingNotes[i] - noteVelocity[i]
     end
 
-    functions.checkMiss(beatMap, beat, accuracy, keypress)
+    --functions.checkMiss(beatMap, beat, accuracy, keypress)
+    if beatMap[beat - 1] == "rest" and beatMap[beat] == "rest" then
+        accuracy = " "
+    end
+
+    if beatCounter + 1 < beat and gameState == "playing" and beatMap[beat] ~= "rest" then
+        accuracy = "Miss"
+        keypress = 0
+    end
+    if beatCounter + 1 < beat and gameState == "Turbo" and beatMap[beat] ~= "rest" then
+        accuracy = "Miss"
+        keypress = 0
+    end
 
     if keypress > maxCombo then
         maxCombo = keypress
@@ -161,11 +173,13 @@ function love.draw()
         love.graphics.setColor(0.2,0.2,0.2, 0.5)
         love.graphics.rectangle("fill", 0, 0, 640, 480)
         love.graphics.setColor(1,1,1)
+        love.graphics.draw(spotlight, spotlightX, backgroundTiltY, 0, 4, 4)
         progressX = 5.9 * score
     end
 
     if gameState == "Turbo" then
         love.graphics.draw(background, -350, -150, 0, 3, 3)
+        love.graphics.draw(spotlight, spotlightX, backgroundTiltY, 0, 4, 4)
         love.graphics.setColor(turboR,turboG,turboB, 0.5)
         love.graphics.rectangle("fill", 0, 0, 640, 480)
         love.graphics.setColor(1,1,1)
@@ -173,7 +187,6 @@ function love.draw()
     end
 
     if gameState == "playing" or gameState == "Turbo" then
-        love.graphics.draw(spotlight, spotlightX, backgroundTiltY, 0, 4, 4)
 
         love.graphics.draw(guitarist.currentFrame, 20, playerTiltY, 0, 3, 3)
         love.graphics.draw(drummer.currentFrame, 450, playerTiltY + 20, 0, 3, 3)
@@ -195,12 +208,10 @@ function love.draw()
         love.graphics.draw(noteTarget, (5), (62-45), 0, 2, 2)
 
         local beat, subbeat = music:getBeat()
-        love.graphics.print(rfidResponse, 500, 10)
         love.graphics.print("Combo: " .. keypress, 10, 130)
         love.graphics.print(accuracy, 300, 10)
         love.graphics.print("Max Combo: " .. maxCombo, 400, 100)
 
-        love.graphics.print(tostring(gpioValue), 400, 400)
     
         for i = noteOffset,#movingNotes,1 do
             if movingNotes[i] < 641 and movingNotes[i] > 20 then
